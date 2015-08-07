@@ -1,0 +1,21 @@
+---
+- hosts: all
+
+  sudo: true
+
+  vars:
+    dbname: template1
+    dbuser: postgres
+    dbpassword: D1ff1cult
+
+  pre_tasks:
+
+    - name: Update apt cache
+      apt: update_cache=yes
+
+    - name: install phyton
+      apt: name=python state=present
+
+  roles:
+    - webserver
+    - database

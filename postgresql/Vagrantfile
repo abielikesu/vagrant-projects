@@ -1,0 +1,114 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# All Vagrant configuration is done below. The "2" in Vagrant.configure
+# configures the configuration version (we support older styles for
+# backwards compatibility). Please don't change it unless you know what
+# you're doing.
+Vagrant.configure(2) do |config|
+  # The most common configuration options are documented and commented below.
+  # For a complete reference, please see the online documentation at
+  # https://docs.vagrantup.com.
+
+
+  # Disable automatic box update checking. If you disable this, then
+  # boxes will only be checked for updates when the user runs
+  # `vagrant box outdated`. This is not recommended.
+  # config.vm.box_check_update = false
+
+  # Ubuntu 15.04 box
+  config.vm.box = "abie-ubuntu-15.04"
+  config.vm.box_url = "http://abie-nas/vboxrepo/abie-ubuntu-15.04/abie-ubuntu-15.04.json"
+
+  # Master postgres server
+  config.vm.define :pg01 do |pg01|
+
+    pg01.vm.provider "virtualbox" do |v|
+      # Set the VM name in VirtualBox
+      v.name = "pg01" 
+
+      # Customize the amount of memory and cpus on the VM:
+      v.memory = 1024
+      v.cpus = 2
+
+      # Display the VirtualBox GUI when booting the machine
+      #v.gui = true
+
+      # Add the VM to /Postgres group
+      v.customize [
+        "modifyvm", :id, 
+        "--groups", "/vagrant/postgresql"
+      ]
+    end
+
+    # Create a private network, which allows host-only access to the machine
+    # using a specific IP.
+    pg01.vm.network "public_network"
+
+    # Create a forwarded port mapping which allows access to a specific port
+    # within the machine from a port on the host machine. In the example below,
+    # accessing "localhost:8080" will access port 80 on the guest machine.
+    pg01.vm.network "forwarded_port", guest: 80, host: 8080
+  end
+
+  # Slave postgres server
+  config.vm.define :pg02 do |pg02|
+
+   pg02.vm.provider "virtualbox" do |v|
+      # Set the VM name in VirtualBox
+      v.name = "pg02" 
+
+      # Customize the amount of memory and cpus on the VM:
+      v.memory = 1024
+      v.cpus = 2
+
+      # Display the VirtualBox GUI when booting the machine
+      #v.gui = true
+
+      # Add the VM to /Postgres group
+      v.customize [
+        "modifyvm", :id, 
+        "--groups", "/vagrant/postgresql"
+      ]
+    end
+
+    # Create a private network, which allows host-only access to the machine
+    # using a specific IP.
+    pg02.vm.network "public_network"
+
+    # Create a forwarded port mapping which allows access to a specific port
+    # within the machine from a port on the host machine. In the example below,
+    # accessing "localhost:8080" will access port 80 on the guest machine.
+    pg02.vm.network "forwarded_port", guest: 80, host: 8081
+  end
+
+  # Define a Vagrant Push strategy for pushing to Atlas. Other push strategies
+  # such as FTP and Heroku are also available. See the documentation at
+  # https://docs.vagrantup.com/v2/push/atlas.html for more information.
+  # config.push.define "atlas" do |push|
+  #   push.app = "YOUR_ATLAS_USERNAME/YOUR_APPLICATION_NAME"
+  # end
+
+  # Enable provisioning with a shell script. Additional provisioners such as
+  # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
+  # documentation for more information about their specific syntax and use.
+  #config.vm.provision "shell", inline: <<-SHELL
+    #echo ""
+    #echo "Installing python ..."
+    #echo ""
+    #sleep 5
+    #sudo apt-get update
+    #sudo apt-get install python -y
+    #echo ""
+    #echo "Master phppgadmin    : http://192.168.33.10/phppgadmin"
+    #echo "Slave  pgppgadmin    : http://192.168.33.11/phppgadmin"
+    #echo "Database credentials : postgres/D1ff1cult"
+    #echo ""
+  #SHELL
+  
+  # Provision using Ansible
+  config.vm.provision :ansible do|ansible|
+    ansible.playbook = "ansible/playbook.yml"
+  end
+
+end

@@ -1,0 +1,34 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# Vagrantfile API/syntax version. Don't touch unless you know what you're doing!
+VAGRANTFILE_API_VERSION = "2"
+
+ENV['VAGRANT_DEFAULT_PROVIDER'] = 'virtualbox'
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+  
+  config.vm.communicator = "winrm"
+  
+  config.vm.define "db01" do |db01|
+    db01.vm.box = "Win2002R2-SP1-base"
+#    db01.vm.network "private_network", ip: "192.168.50.10"
+    db01.vm.network "public_network"
+    db01.vm.network :forwarded_port, guest: 3389, host: 3389
+    db01.vm.provision :shell, path: "scripts/install-dot-net.ps1"
+    db01.vm.provision :shell, path: "scripts/install-sqlserver.ps1"
+    db01.vm.provision :shell, path: "scripts/configure-sql-port.ps1"
+    db01.vm.provision :shell, path: "scripts/enable-rdp.ps1"
+  end
+  
+#  config.vm.define "db02" do |db02|
+#    db02.vm.box = "Win2002R2-SP1-base"
+#    db02.vm.network "private_network", ip: "192.168.50.11"
+#    db02.vm.network :forwarded_port, guest: 3389, host: 3390
+#    db02.vm.provision :shell, path: "scripts/install-dot-net.ps1"
+#    db02.vm.provision :shell, path: "scripts/install-sqlserver.ps1"
+#    db02.vm.provision :shell, path: "scripts/configure-sql-port.ps1"
+#    db02.vm.provision :shell, path: "scripts/enable-rdp.ps1"
+#  end
+  
+end

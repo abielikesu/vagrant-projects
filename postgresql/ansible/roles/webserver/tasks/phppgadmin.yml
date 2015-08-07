@@ -1,0 +1,15 @@
+---
+- name: Install phppgadmin
+  apt: name=phppgadmin state=present
+- name: Configure Apache
+  replace: 
+    dest=/etc/apache2/conf-available/phppgadmin.conf 
+    regexp='^Require local'
+    replace='allow from all'
+    backup=yes
+  notify:
+    - reload apache
+- name: Configure phppgadmin
+  shell: /vagrant/scripts/pgadminConfig.sh
+  notify:
+    - reload apache

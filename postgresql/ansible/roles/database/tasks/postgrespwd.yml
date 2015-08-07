@@ -1,0 +1,6 @@
+---
+- name: change postgres password
+  shell: /vagrant/scripts/pgConfig.sh
+
+  notify:
+    - reload postgresql

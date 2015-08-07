@@ -1,0 +1,10 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure(2) do |config|
+  config.vm.box = "Win2012-DC-Sp1"
+  config.vm.communicator = "winrm"
+  config.winrm.username = "Administrator"
+  config.winrm.password = 'Stnhp$5m'
+  config.vm.network "forwarded_port", host: 33389, guest: 3389
+end
